@@ -13,6 +13,7 @@ dist
 dist-ssr
 coverage
 *.local
+stats.html
 
 /cypress/videos/
 /cypress/screenshots/
@@ -20,6 +21,7 @@ coverage
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 *.suo
 *.ntvs*
@@ -27,5 +29,6 @@ coverage
 *.sln
 *.sw?
 
-test-results/
-playwright-report/
+/src/typings/components.d.ts
+package-lock.json
+yarn.lock
