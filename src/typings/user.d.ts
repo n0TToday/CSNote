@@ -1,11 +1,9 @@
 /** 用户相关模块 */
 declare namespace Auth {
   /**
-   * 用户角色类型(前端静态路由用角色类型进行路由权限的控制)
-   * - super: 超级管理员(该权限具有所有路由数据)
+   * 用户角色类型
    * - admin: 管理员
    * - user: 用户
-   * - custom: 自定义角色
    */
   type RoleType = keyof typeof import('@/enum').EnumUserRole;
 
@@ -19,3 +17,4 @@ declare namespace Auth {
     userRole: RoleType;
   }
 }
+type UserInfo = Auth.UserInfo;

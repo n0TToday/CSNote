@@ -4,7 +4,7 @@ import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { useBoolean, useLoading } from '@/hooks';
 import CustomAxiosInstance from './instance';
 
-type RequestMethod = 'get' | 'post' | 'put' | 'delete';
+type RequestMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
 interface RequestParam {
   url: string;
@@ -71,6 +71,15 @@ export function createRequest(axiosConfig: AxiosRequestConfig, backendConfig?: S
   function put<T>(url: string, data?: any, config?: AxiosRequestConfig) {
     return asyncRequest<T>({ url, method: 'put', data, axiosConfig: config });
   }
+  /**
+   * patch请求
+   * @param url - 请求地址
+   * @param data - 请求的body的data
+   * @param config - axios配置
+   */
+  function patch<T>(url: string, data?: any, config?: AxiosRequestConfig) {
+    return asyncRequest<T>({ url, method: 'patch', data, axiosConfig: config });
+  }
 
   /**
    * delete请求
@@ -85,6 +94,7 @@ export function createRequest(axiosConfig: AxiosRequestConfig, backendConfig?: S
     get,
     post,
     put,
+    patch,
     delete: handleDelete
   };
 }

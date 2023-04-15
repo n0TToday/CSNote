@@ -10,16 +10,8 @@ export const userModel: UserModel[] = [
     refreshToken: '__REFRESH_TOKEN_SOYBEAN__',
     userId: '0',
     userName: 'Soybean',
-    userRole: 'super',
+    userRole: 'admin',
     password: 'soybean123'
-  },
-  {
-    token: '__TOKEN_SUPER__',
-    refreshToken: '__REFRESH_TOKEN_SUPER__',
-    userId: '1',
-    userName: 'Super',
-    userRole: 'super',
-    password: 'super123'
   },
   {
     token: '__TOKEN_ADMIN__',

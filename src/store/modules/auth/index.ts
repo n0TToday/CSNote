@@ -128,10 +128,6 @@ export const useAuthStore = defineStore('auth-store', {
       const { resetRouteStore, initAuthRoute } = useRouteStore();
 
       const accounts: Record<Auth.RoleType, { userName: string; password: string }> = {
-        super: {
-          userName: 'Super',
-          password: 'super123'
-        },
         admin: {
           userName: 'Admin',
           password: 'admin123'

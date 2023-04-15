@@ -7,6 +7,11 @@ export const views: Record<RouterPage.LastDegreeRouteKey, RouteComponent | (() =
   'constant-page': () => import('./_builtin/constant-page/index.vue'),
   login: () => import('./_builtin/login/index.vue'),
   'not-found': () => import('./_builtin/not-found/index.vue'),
+  dashboard_analysis: () => import('./dashboard/analysis/index.vue'),
+  dashboard_workbench: () => import('./dashboard/workbench/index.vue'),
+  'fast-note': () => import('./fast-note/index.vue'),
   'multi-menu_first_second-new_third': () => import('./multi-menu/first/second-new/third/index.vue'),
-  'multi-menu_first_second': () => import('./multi-menu/first/second/index.vue')
+  'multi-menu_first_second': () => import('./multi-menu/first/second/index.vue'),
+  repo_list: () => import('./repo/list/index.vue'),
+  user: () => import('./user/index.vue')
 };
