@@ -1,35 +1,168 @@
 import { defineStore } from 'pinia';
-import { createRepoApi, deleteRepoApi, getRepoDetailApi, getRepoListApi, updateRepoApi } from '~/src/service';
-import { isNull } from '~/src/utils';
-import { emptyRepo, emptyRepoInfo, hasNoteInRepo, initNewRepo } from './helper';
+import {
+  createRepoApi,
+  deleteRepoApi,
+  getDelRepoListApi,
+  getRepoApi,
+  getRepoListApi,
+  getStarRepoListApi,
+  updateRepoApi
+} from '~/src/service';
+import { isNumber } from '~/src/utils';
+import { useAppStore } from '../app';
 
 interface RepoState {
-  /** 使用到的知识库信息状态，在state中按需使用 */
+  /** 知识库详情 */
   repoDetail: Repo.RepoDetail[];
-  /** 用户名下所有知识库，由后端返回 */
-  repoList: Repo.RepoInfo[];
+  /** 当前知识库 */
+  currentRepo?: Repo.RepoDetail;
+  /** 普通（包括收藏）知识库 列表 */
+  repoList: Repo.RepoList[];
+  /** 收藏的知识库 列表 */
+  starRepoList: Repo.StarRepoList[];
+  /** 回收站知识库 列表 */
+  delRepoList: Repo.DelRepoList[];
 }
 
 export const useRepoStore = defineStore('repo-store', {
   state: (): RepoState => ({
-    repoDetail: [emptyRepo],
-    repoList: [emptyRepoInfo]
+    // 是否需要currentRD这种？
+    repoDetail: [],
+    currentRepo: undefined,
+    delRepoList: [],
+    repoList: [],
+    starRepoList: []
   }),
   getters: {},
   actions: {
-    /* store本身相关业务逻辑 */
+    // 用户信息
 
-    /** 重置store */
+    /* 业务逻辑（暴露方法） */
+
+    /* 创建新知识库 */
+    async createNewRepo(title: string) {
+      const { data } = await createRepoApi({ repoTitle: title });
+      if (data) {
+        window.$message?.success('知识库创建成功~');
+        await this.initList();
+      }
+    },
+
+    /* 回收站移出移入 */
+    async delRepo(repoId: string) {
+      // 获取repo详情
+      const repo = await this.findRepo(repoId);
+      if (repo) {
+        // 更新repo
+        await updateRepoApi('del', repoId, repo);
+        // 刷新三个list
+        this.initList();
+        // 刷新RD
+        this.getRepo(repoId);
+        window.$message?.success('操作成功！');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 300);
+      }
+    },
+
+    /* 收藏操作 */
+    async starRepo(repoId: string) {
+      // 获取repo详情
+      const repo = await this.findRepo(repoId);
+      if (repo) {
+        // 更新repo
+        await updateRepoApi('star', repoId, repo);
+        // 刷新三个list
+        this.initList();
+        // 刷新RD
+        this.getRepo(repoId);
+        window.$message?.success('操作成功！');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 300);
+      }
+    },
+
+    /* 编辑信息操作 */
+    async changeRepo(repoId: string, repoInfo: Repo.RepoDetail) {
+      // 更新repo
+      await updateRepoApi('', repoId, repoInfo);
+      // 刷新三个list
+      this.initList();
+      // 刷新RD
+      this.getRepo(repoId);
+    },
+
+    /* 彻底删除Repo */
+    async deleteRepo(repoId: string) {
+      const repo = await this.findRepo(repoId);
+      if (repo) {
+        await deleteRepoApi(repoId);
+        this.initList();
+        this.removeRepo(repoId);
+      }
+    },
+
+    /* 获取Repo详情（先本地，再在线） */
+    async findRepo(repoId: string) {
+      // 查找state
+      const num = this.hasRepo(repoId);
+      if (isNumber(num)) return this.repoDetail[num];
+      // 在线查找
+      const repo = await this.getRepo(repoId);
+      if (repo) return repo;
+      return false;
+    },
+
+    /* 刷新repo详情（直接在线） */
+    async getRepo(repoId: string) {
+      const { data } = await getRepoApi(repoId);
+      if (data) {
+        // 查找state
+        const num = this.hasRepo(repoId);
+        if (isNumber(num)) {
+          this.repoDetail[num] = data;
+          return data;
+        }
+        // 存入state
+        this.repoDetail.push(data);
+        return data;
+      }
+      return false;
+    },
+
+    /* 内部封装函数 */
+
+    // 初始化、刷新列表
+    async initList() {
+      await this.initRepoList();
+      await this.initDelRepoList();
+      await this.initStarRepoList();
+    },
+    async initRepoList() {
+      const { data } = await getRepoListApi();
+      if (data) this.repoList = data;
+    },
+    async initStarRepoList() {
+      const { data } = await getStarRepoListApi();
+      if (data) this.starRepoList = data;
+    },
+    async initDelRepoList() {
+      const { data } = await getDelRepoListApi();
+      if (data) this.delRepoList = data;
+    },
+
+    // 重置store
     resetRepoStore() {
       this.$reset();
     },
 
-    /** 检查repo是否已存在并返回位置 */
-    hasRepoInState(repoId: string) {
-      if (isNull(repoId)) return false;
+    // 检查repo是否已存在并返回位置
+    hasRepo(repoId: string) {
       let index = 0;
       for (const repo of this.repoDetail) {
-        if (repo.repoInfo.repoId === repoId) {
+        if (repo.repoId === repoId) {
           return index;
         }
         index += 1;
@@ -37,151 +170,13 @@ export const useRepoStore = defineStore('repo-store', {
       return false;
     },
 
-    /** 向state中添加repo */
-    addRepoToState(repo: Repo.RepoDetail) {
-      const repoId: string = repo.repoInfo.repoId;
-      if (isNull(repoId)) return false;
-      if (this.hasRepoInState(repoId)) return false;
-
-      this.repoDetail.push(repo);
-      return true;
-    },
-
-    /** 从state中删除repo */
-    removeRepoFromState(repoId: string) {
-      const num = this.hasRepoInState(repoId);
+    // 从state中删除repo
+    removeRepo(repoId: string) {
+      const num = this.hasRepo(repoId);
       if (num) {
         this.repoDetail.splice(num);
         return true;
       }
-      return false;
-    },
-
-    /* 更新state中repo元素 */
-    updateRepoInState(repo: Repo.RepoDetail) {
-      const repoId: string = repo.repoInfo.repoId;
-      this.removeRepoFromState(repoId);
-      if (!this.addRepoToState(repo)) return false;
-      return true;
-    },
-
-    /* 知识库相关业务逻辑 */
-
-    /** 创建新知识库 */
-    async createNewRepo(title: string, desc?: string) {
-      // 初始化新知识库 包含创建时间及用户信息
-      const newRepo = initNewRepo();
-
-      // 生成根据传入参数生成新知识库实例
-      newRepo.repoInfo.repoTitle = title;
-      if (desc) newRepo.repoDesc = desc;
-
-      // 调用创建函数
-      const { data } = await createRepoApi(newRepo);
-
-      // 返回结果repoId
-      if (data) {
-        newRepo.repoInfo.repoId = data;
-        // 更新知识库列表
-        await this.refreshRepoList();
-        // 更新state
-        if (this.addRepoToState(newRepo)) {
-          window.$notification?.success({
-            title: '创建知识库成功!',
-            content: `添加你的第一个笔记吧!`,
-            duration: 3000
-          });
-        }
-        // To-Do
-        // 询问是否进入新建的知识库
-      }
-    },
-
-    /** 查找知识库信息 */
-    async getRepoDetail(repoId: string) {
-      // 获取当前知识库详情
-      const num = this.hasRepoInState(repoId);
-      if (num) {
-        return this.repoDetail[num];
-      }
-      const { data } = await getRepoDetailApi(repoId);
-      if (data) return data;
-
-      return false;
-    },
-
-    /** 修改知识库信息 */
-    async updateRepo(repo: Repo.RepoDetail) {
-      const repoId = repo.repoInfo.repoId;
-      const { data } = await updateRepoApi(repoId, repo);
-      if (data) {
-        // 刷新库列表
-        await this.refreshRepoList;
-        // 更新state
-        if (this.updateRepoInState(data)) {
-          return true;
-        }
-      }
-      return false;
-    },
-
-    /** 删库，跑路 */
-    async deleteRepo(repoId: string) {
-      // 页面逻辑中应将该知识库下所有笔记修改为默认知识库
-      // 调用删除函数
-      return deleteRepoApi(repoId);
-    },
-
-    /* 抽象出复用具体业务逻辑 */
-
-    /** 刷新知识库列表 */
-    async refreshRepoList() {
-      // 重新请求后端数据库
-      const { data } = await getRepoListApi();
-      if (data) {
-        // 将state中的列表用返回的列表替换
-        this.repoList = data;
-      }
-    },
-
-    /** 向库中添加笔记 */
-    async addNoteToRepo(note: Note.NoteInfoThin, repoId: string) {
-      const repo = await this.getRepoDetail(repoId);
-      if (repo) {
-        // 修改知识库中笔记列表
-        repo.noteList.push(note);
-        // 修改知识库笔记数量
-        repo.repoInfo.repoNoteNum += 1;
-        // 提交更新
-        return this.updateRepo(repo);
-      }
-      return false;
-    },
-
-    /** 从库中删除笔记 */
-    async deleteNoteFromRepo(note: Note.NoteInfoThin, repoId: string) {
-      // 获取当前知识库详情
-      const repo = await this.getRepoDetail(repoId);
-      if (repo) {
-        const num = hasNoteInRepo(repo, note.noteId);
-        if (num) {
-          // 修改知识库中笔记列表
-          repo.noteList.splice(num);
-          // 修改知识库笔记数量
-          repo.repoInfo.repoNoteNum -= 1;
-        }
-        // 提交更新
-        return this.updateRepo(repo);
-      }
-      return false;
-    },
-
-    /** 从旧库中笔记到新库 */
-    async moveNoteToRepo(note: Note.NoteInfoThin, oldRepoId: string, newRepoId: string) {
-      // 添加进新知识库
-      if (await this.addNoteToRepo(note, newRepoId))
-        // 从旧知识库中删除并更新
-        return this.deleteNoteFromRepo(note, oldRepoId);
       return false;
     }
   }

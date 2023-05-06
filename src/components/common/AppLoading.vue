@@ -29,7 +29,7 @@ const lodingClasses = [
 ];
 
 function addThemeColorCssVars() {
-  const defaultColor = '#1890ff';
+  const defaultColor = '#f4511e';
   const themeColor = localStg.get('themeColor') || defaultColor;
   const cssVars = `--primary-color: ${themeColor}`;
   document.documentElement.style.cssText = cssVars;

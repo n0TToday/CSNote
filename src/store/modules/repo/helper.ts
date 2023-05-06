@@ -1,30 +1,45 @@
-import { getNowTimeStamp, isNull } from '~/src/utils';
+import { getNowTimeStamp } from '~/src/utils';
 import { useAuthStore } from '../auth';
 
-export const emptyRepoInfo: Repo.RepoInfo = {
-  repoId: '',
-  repoNoteNum: 0,
-  repoTitle: '',
-  isStar: false
-};
 export const emptyRepo: Repo.RepoDetail = {
-  repoInfo: emptyRepoInfo,
-  createInfo: {
-    createDate: 0,
-    createUser: {
-      userId: '',
-      userName: '',
-      userRole: 'user'
+  repoId: '',
+  repoTitle: '',
+  repoNoteNum: 0,
+  visitNum: 0,
+  updateTime: 0,
+  isStar: false,
+  starTime: 0,
+  isDel: false,
+  delTime: 0,
+  createTime: 0,
+  userId: '',
+  userName: '',
+  noteList: [
+    {
+      noteId: '',
+      noteTitle: '',
+      isStar: false,
+      isArchive: false,
+      isShare: false,
+      createTime: 0,
+      updateTime: 0
     }
-  },
-  noteList: [{ noteId: '', noteTitle: '' }]
+  ]
 };
 
-export function initNewRepo() {
-  const newRepo = emptyRepo;
-  newRepo.createInfo.createDate = getNowTimeStamp();
-  newRepo.createInfo.createUser = useAuthStore().userInfo;
+export function initNewRepo(rt: string) {
+  const newRepo = {
+    repoTitle: rt
+  };
   return newRepo;
+}
+
+export function getCreateInfo() {
+  const createInfo = {
+    createTime: getNowTimeStamp(),
+    createUser: useAuthStore().userInfo
+  };
+  return createInfo;
 }
 
 export function isEmptyRepo(repo: Repo.RepoDetail) {
@@ -35,15 +50,15 @@ export function isEmptyRepo(repo: Repo.RepoDetail) {
 }
 
 /** 检查repo中Note是否存在并返回位置 */
-export function hasNoteInRepo(repo: Repo.RepoDetail, noteId: string) {
-  if (isNull(noteId)) return false;
-  const noteList = repo.noteList;
-  let index = 0;
-  for (const i of noteList) {
-    if (i.noteId === noteId) {
-      return index;
-    }
-    index += 1;
-  }
-  return false;
-}
+// export function hasNoteInRepo(repo: Repo.RepoDetail, value: string) {
+//   if (isNull(value)) return false;
+//   const noteList = repo.noteList;
+//   let index = 0;
+//   for (const i of noteList) {
+//     if (i.value === value) {
+//       return index;
+//     }
+//     index += 1;
+//   }
+//   return false;
+// }

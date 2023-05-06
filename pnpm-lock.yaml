@@ -36,6 +36,9 @@ dependencies:
   dayjs:
     specifier: ^1.11.7
     version: 1.11.7
+  echarts:
+    specifier: ^5.4.2
+    version: 5.4.2
   form-data:
     specifier: ^4.0.0
     version: 4.0.0
@@ -2266,6 +2269,13 @@ packages:
   /duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
     dev: true
+
+  /echarts@5.4.2:
+    resolution: {integrity: sha512-2W3vw3oI2tWJdyAz+b8DuWS0nfXtSDqlDmqgin/lfzbkB01cuMEN66KWBlmur3YMp5nEDEEt5s23pllnAzB4EA==}
+    dependencies:
+      tslib: 2.3.0
+      zrender: 5.4.3
+    dev: false
 
   /ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -6016,6 +6026,10 @@ packages:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: true
 
+  /tslib@2.3.0:
+    resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
+    dev: false
+
   /tslib@2.4.1:
     resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==}
     dev: true
@@ -6683,3 +6697,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zrender@5.4.3:
+    resolution: {integrity: sha512-DRUM4ZLnoaT0PBVvGBDO9oWIDBKFdAVieNWxWwK0niYzJCMwGchRk21/hsE+RKkIveH3XHCyvXcJDkgLVvfizQ==}
+    dependencies:
+      tslib: 2.3.0
+    dev: false

@@ -28,9 +28,9 @@ export default class CustomAxiosInstance {
   constructor(
     axiosConfig: AxiosRequestConfig,
     backendConfig: Service.BackendResultConfig = {
-      codeKey: 'code',
+      codeKey: 'status',
       dataKey: 'data',
-      msgKey: 'message',
+      msgKey: 'statusText',
       successCode: 200
     }
   ) {
@@ -49,7 +49,7 @@ export default class CustomAxiosInstance {
           const contentType = handleConfig.headers['Content-Type'] as string;
           handleConfig.data = await transformRequestData(handleConfig.data, contentType);
           // 设置token
-          handleConfig.headers.Authorization = localStg.get('token') || '';
+          handleConfig.headers.Authorization = `Bearer ${localStg.get('token')}`;
         }
         return handleConfig;
       },
@@ -62,15 +62,15 @@ export default class CustomAxiosInstance {
       async response => {
         const { status } = response;
         if (status === 200 || status < 300 || status === 304) {
-          const backend = response.data;
-          const { codeKey, dataKey, successCode } = this.backendConfig;
+          const backend = response;
+          const { successCode } = this.backendConfig;
           // 请求成功
-          if (backend[codeKey] === successCode) {
-            return handleServiceResult(null, backend[dataKey]);
+          if (response.status === successCode) {
+            return handleServiceResult(null, response.data);
           }
 
           // token失效, 刷新token
-          if (REFRESH_TOKEN_CODE.includes(backend[codeKey])) {
+          if (REFRESH_TOKEN_CODE.includes(response.status)) {
             const config = await handleRefreshToken(response.config);
             if (config) {
               return this.instance.request(config);

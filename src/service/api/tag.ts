@@ -1,21 +1,9 @@
-import { mockRequest } from '../request';
+import { request } from '../request';
 
 export function getTagApi(tagId: string) {
-  return mockRequest.get<Tag.TagDetail>(`/Tag/${tagId}`);
+  return request.get<Tag.TagDetail>(`/tag/${tagId}`);
 }
 
 export function getTagListApi() {
-  return mockRequest.get<Tag.TagInfo[]>(`/Tag/`);
-}
-
-export function createTagApi(newTag: Tag.TagDetail) {
-  return mockRequest.post<string>('/Tag', newTag);
-}
-
-export function deleteTagApi(tagId: string) {
-  return mockRequest.delete<boolean>(`/Tag/${tagId}`, {});
-}
-
-export function updateTagApi(tagId: string, modifyTag: Tag.TagDetail) {
-  return mockRequest.put<Tag.TagDetail>(`/Tag/${tagId}`, modifyTag);
+  return request.get<Tag.TagList[]>(`/tag/`);
 }

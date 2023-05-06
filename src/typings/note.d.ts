@@ -1,31 +1,56 @@
 /** 笔记、速记相关类型 */
 declare namespace Note {
-  /** 笔记简略信息 */
-  interface NoteInfo {
+  interface NoteDetail {
     noteId: string;
     noteTitle: string;
-    /** 区分速记和笔记类型 */
-    noteType: 'note' | 'fast';
-    noteRepo?: Repo.RepoInfo;
-    isShare: boolean;
-    isStar: boolean;
-    isArchive: boolean;
+    noteType: string;
     visitNum: number;
-    noteTag: Tag.TagInfo[];
-    createInfo: {
-      createTime: number;
-      createUser: UserInfo;
-    };
-  }
+    repoId: string;
+    tagList: string[];
+    updateTime: number;
 
-  /** 笔记具体内容 */
-  interface NoteDetail {
-    noteInfo: NoteInfo;
+    isShare: boolean;
+    shareTime: number;
+
+    isStar: boolean;
+    starTime: number;
+
+    isArchive: boolean;
+    archTime: number;
+
+    isDel: boolean;
+    delTime: number;
+
+    createTime: number;
+    userId: string;
+    userName: string;
+
     noteContent: any;
   }
 
-  interface NoteInfoThin {
+  interface FastNoteList {
+    noteId: string;
+    noteContent: string;
+    createTime: number;
+  }
+  interface DelNoteList {
     noteId: string;
     noteTitle: string;
+    delTime: number;
+  }
+  interface StarNoteList {
+    noteId: string;
+    noteTitle: string;
+    starTime: number;
+  }
+  interface ArchNoteList {
+    noteId: string;
+    noteTitle: string;
+    archTime: number;
+  }
+  interface ShareNoteList {
+    noteId: string;
+    noteTitle: string;
+    shareTime: number;
   }
 }

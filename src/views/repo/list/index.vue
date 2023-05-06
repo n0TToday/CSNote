@@ -1,54 +1,40 @@
 <template>
-  <n-button :on-click="repoStore.refreshRepoList">刷新知识库列表</n-button>
-  <n-data-table :columns="columns" :data="repoStore.repoList" :bordered="false" />
+  <n-card class="m-r-3 shadow-md rounded-8px">
+    <n-text class="m-3 text-8">我的知识库</n-text>
+    <n-text class="m-3 text-4">共 {{ repoStore.repoList.length }} 个</n-text>
+    <n-button type="primary" class="m-3 float-right" @click="createCardShow = true">建个新的 </n-button>
+    <n-modal
+      v-model:show="createCardShow"
+      :mask-closable="false"
+      preset="dialog"
+      title="创建新知识库"
+      positive-text="确认创建"
+      negative-text="算了"
+      :on-positive-click="createNewRepo"
+    >
+      <n-input v-model:value="newRepoTitle" placeholder="请输入知识库名称"></n-input>
+    </n-modal>
+    <!-- <n-button :loading="refreshLoadding" :on-click="getRepoInfo" class="m-3 float-right"> 刷新一下 </n-button> -->
+  </n-card>
+  <n-grid x-gap="12" :cols="4">
+    <n-gi v-for="repo of repoStore.repoList" :key="repo.repoId">
+      <repo-card v-bind="repo"></repo-card>
+    </n-gi>
+  </n-grid>
 </template>
 
 <script lang="ts" setup>
-import { h } from 'vue';
-import { NButton, useMessage } from 'naive-ui';
-import type { DataTableColumns } from 'naive-ui';
+import { ref } from 'vue';
+import { NButton } from 'naive-ui';
 import { useRepoStore } from '~/src/store/modules/repo';
+import { RepoCard } from './components';
 
 const repoStore = useRepoStore();
-repoStore.refreshRepoList();
+repoStore.initList();
+const createCardShow = ref(false);
+const newRepoTitle = ref('');
 
-const createColumns = ({ action }: { action: (row: Repo.RepoInfo) => void }): DataTableColumns<Repo.RepoInfo> => {
-  return [
-    {
-      title: '库ID',
-      key: 'repoId'
-    },
-    {
-      title: '名称',
-      key: 'repoTitle'
-    },
-    {
-      title: '笔记数量',
-      key: 'repoNoteNum'
-    },
-    {
-      title: '行为',
-      key: 'actions',
-      render(row) {
-        return h(
-          NButton,
-          {
-            strong: true,
-            tertiary: true,
-            size: 'small',
-            onClick: () => action(row)
-          },
-          { default: () => 'Play' }
-        );
-      }
-    }
-  ];
-};
-
-const message = useMessage();
-const columns = createColumns({
-  action(row: Repo.RepoInfo) {
-    message.info(`Play ${row.repoTitle}`);
-  }
-});
+function createNewRepo() {
+  repoStore.createNewRepo(newRepoTitle.value);
+}
 </script>

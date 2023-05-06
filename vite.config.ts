@@ -16,8 +16,7 @@ export default defineConfig(configEnv => {
     resolve: {
       alias: {
         '~': rootPath,
-        '@': srcPath,
-        'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js'
+        '@': srcPath
       }
     },
     plugins: setupVitePlugins(viteEnv),
@@ -32,11 +31,12 @@ export default defineConfig(configEnv => {
       host: '0.0.0.0',
       port: 3200,
       open: true,
-      proxy: createViteProxy(isOpenProxy, envConfig)
+      proxy: createViteProxy(isOpenProxy, envConfig),
+      hmr: true
     },
     build: {
       reportCompressedSize: false,
-      sourcemap: false,
+      sourcemap: true,
       commonjsOptions: {
         ignoreTryCatch: false
       }

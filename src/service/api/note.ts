@@ -1,25 +1,36 @@
-import { mockRequest } from '../request';
+import { request } from '../request';
 
-export function getNoteInfoApi(noteId: string) {
-  return mockRequest.get<Note.NoteInfo>(`/note/${noteId}`);
+export function getNoteListApi() {
+  return request.get<object[]>(`/note`);
+}
+export function getFastNoteListApi() {
+  return request.get<Note.FastNoteList[]>(`/note?type=fast`);
+}
+export function getDelNoteListApi() {
+  return request.get<Note.DelNoteList[]>(`/note?type=del`);
+}
+export function getStarNoteListApi() {
+  return request.get<Note.StarNoteList[]>(`/note?type=star`);
+}
+export function getArchNoteListApi() {
+  return request.get<Note.ArchNoteList[]>(`/note?type=arch`);
+}
+export function getShareNoteListApi() {
+  return request.get<Note.ShareNoteList[]>(`/note?type=share`);
 }
 
-export function getNoteDetailApi(noteId: string) {
-  return mockRequest.get<Note.NoteDetail>(`/note/${noteId}`);
+export function getNoteApi(noteId: string) {
+  return request.get<Note.NoteDetail>(`/note/${noteId}`);
 }
 
 export function createNoteApi(newNote: Note.NoteDetail) {
-  return mockRequest.post<string>('/note', newNote);
+  return request.post<string>('/note', newNote);
 }
 
 export function deleteNoteApi(noteId: string) {
-  return mockRequest.delete(`/note/${noteId}`, {});
+  return request.delete(`/note/${noteId}`, {});
 }
 
-export function updateNoteInfoApi(noteId: string, noteInfo: Note.NoteInfo) {
-  return mockRequest.patch<Note.NoteInfo>(`/note/${noteId}`, noteInfo);
-}
-
-export function updateNoteDetailApi(noteId: string, noteDetail: Note.NoteDetail) {
-  return mockRequest.patch<Note.NoteDetail>(`/note/${noteId}`, noteDetail);
+export function updateNoteApi(noteId: string, type: string, noteDetail?: Note.NoteDetail) {
+  return request.put<Note.NoteDetail>(`/note/${noteId}?type=${type}`, noteDetail);
 }

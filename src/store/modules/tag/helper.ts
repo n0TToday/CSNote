@@ -1,9 +1,9 @@
-import { getNowTimeStamp, isNull } from '~/src/utils';
+import { getNowTimeStamp } from '~/src/utils';
 import { useAuthStore } from '../auth';
 
 export const emptyTagInfo: Tag.TagInfo = {
-  tagId: '',
-  tagTitle: ''
+  value: '',
+  label: ''
 };
 export const emptyTag: Tag.TagDetail = {
   tagInfo: emptyTagInfo,
@@ -15,8 +15,7 @@ export const emptyTag: Tag.TagDetail = {
       userName: '',
       userRole: 'user'
     }
-  },
-  noteList: [{ noteId: '', noteTitle: '' }]
+  }
 };
 export function initNewTag() {
   const newTag = emptyTag;
@@ -33,15 +32,15 @@ export function isEmptyTag(Tag: Tag.TagDetail) {
 }
 
 /** 检查Tag中Note是否存在并返回位置 */
-export function hasNoteInTag(Tag: Tag.TagDetail, noteId: string) {
-  if (isNull(noteId)) return false;
-  const noteList = Tag.noteList;
-  let index = 0;
-  for (const i of noteList) {
-    if (i.noteId === noteId) {
-      return index;
-    }
-    index += 1;
-  }
-  return false;
-}
+// export function hasNoteInTag(Tag: Tag.TagDetail, noteId: string) {
+//   if (isNull(noteId)) return false;
+//   const noteList = Tag.noteList;
+//   let index = 0;
+//   for (const i of noteList) {
+//     if (i.noteId === noteId) {
+//       return index;
+//     }
+//     index += 1;
+//   }
+//   return false;
+// }

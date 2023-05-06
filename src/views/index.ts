@@ -12,6 +12,11 @@ export const views: Record<RouterPage.LastDegreeRouteKey, RouteComponent | (() =
   'fast-note': () => import('./fast-note/index.vue'),
   'multi-menu_first_second-new_third': () => import('./multi-menu/first/second-new/third/index.vue'),
   'multi-menu_first_second': () => import('./multi-menu/first/second/index.vue'),
+  note_create: () => import('./note/create/index.vue'),
+  note_detail: () => import('./note/detail/index.vue'),
+  repo_detail: () => import('./repo/detail/index.vue'),
   repo_list: () => import('./repo/list/index.vue'),
+  rubbish: () => import('./rubbish/index.vue'),
+  star: () => import('./star/index.vue'),
   user: () => import('./user/index.vue')
 };

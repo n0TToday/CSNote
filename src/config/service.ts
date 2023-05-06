@@ -30,6 +30,9 @@ export const ERROR_STATUS = {
   404: '404: 请求的资源不存在~',
   405: '405: 请求方法未允许~',
   408: '408: 网络请求超时~',
+  410: '410: Token过期~',
+  411: '411: 用户名或密码错误！',
+  412: '412: 请输入用户名或密码！',
   500: '500: 服务器内部错误~',
   501: '501: 服务器未实现请求功能~',
   502: '502: 错误网关~',
@@ -43,4 +46,4 @@ export const ERROR_STATUS = {
 export const NO_ERROR_MSG_CODE: (string | number)[] = [];
 
 /** token失效需要刷新token的code(这里的66666只是个例子，需要将后端表示token过期的code填进来) */
-export const REFRESH_TOKEN_CODE: (string | number)[] = [66666];
+export const REFRESH_TOKEN_CODE: (string | number)[] = [410];

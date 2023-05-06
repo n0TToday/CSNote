@@ -7,7 +7,8 @@ export function toDateTime(timestamp: number) {
 }
 
 export function getNowTimeStamp() {
-  return Date.now();
+  const timestamp = Date.parse(new Date().toString());
+  return timestamp;
 }
 
 export function formatTimeInterval(timestamp: number) {

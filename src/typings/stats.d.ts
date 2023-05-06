@@ -1,11 +1,21 @@
 /** 统计数据相关类型 */
 declare namespace Stats {
   interface Activity {
-    activeObjType: 'tag' | 'repo' | 'fast-note' | 'note';
+    activeId: string;
+    activeObjType: string;
     activeObjId: string;
-    activeType: 'create' | 'modify' | 'delete' | 'visit' | 'share';
+    activeType: number;
     activeTime: number;
     activeUserId: string;
-    activeDetail?: JSON;
+    activeDetail?: string;
+  }
+
+  interface InfoActive {
+    noteNum: number;
+    tagNum: number;
+    repoNum: number;
+    useDay: number;
+    activeNum: number;
+    lastLoginIP: string;
   }
 }

@@ -1,38 +1,71 @@
 /** 知识库相关类型 */
 declare namespace Repo {
-  interface RepoInfo {
+  interface RepoDetail {
+    repoId: string;
+    repoTitle: string;
+
+    repoNoteNum: number;
+    visitNum: number;
+    updateTime: number;
+
+    isStar: boolean;
+    starTime: number;
+
+    isDel: boolean;
+    delTime: number;
+
+    createTime: number;
+    userId: string;
+    userName: string;
+
+    noteList: {
+      noteId: string;
+      noteTitle: string;
+      isStar: boolean;
+      isShare: boolean;
+      isArchive: boolean;
+      createTime: number;
+      updateTime: number;
+    }[];
+  }
+  /** 普通（包括收藏）知识库 列表 */
+  interface RepoList {
     repoId: string;
     repoTitle: string;
     repoNoteNum: number;
     isStar: boolean;
+    createTime: number;
   }
-
-  interface RepoDetail {
-    repoInfo: RepoInfo;
-    repoDesc?: string;
-    createInfo: {
-      createTime: number;
-      createUser: UserInfo;
-    };
-    visitNum: number;
-    noteList: Note.NoteInfoThin[];
+  /** 收藏的知识库 列表 */
+  interface StarRepoList {
+    repoId: string;
+    repoTitle: string;
+    repoNoteNum: number;
+    starTime: number;
+  }
+  /** 回收站知识库 列表 */
+  interface DelRepoList {
+    repoId: string;
+    repoTitle: string;
+    repoNoteNum: number;
+    delTime: number;
   }
 }
 
 /** 标签相关类型 */
 declare namespace Tag {
-  interface TagInfo {
-    tagId: string;
-    tagTitle: string;
-  }
-
   interface TagDetail {
-    tagInfo: TagInfo;
+    tagId?: string;
+    tagTitle: string;
     tagNoteNum: number;
-    noteList: Note.NoteInfoThin[];
-    createInfo: {
-      createTime: number;
-      createUser: UserInfo;
-    };
+    createTime: number;
+    userId: string;
+    userName: string;
+  }
+  interface TagList {
+    tagId?: string;
+    tagTitle: string;
+    tagNoteNum: number;
+    createTime: number;
   }
 }

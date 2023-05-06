@@ -13,7 +13,7 @@ export default function useSmsCode() {
   const label = computed(() => {
     let text = initLabel;
     if (loading.value) {
-      text = '';
+      text = '123456';
     }
     if (isCounting.value) {
       text = countingLabel(counts.value);

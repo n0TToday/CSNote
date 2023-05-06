@@ -1,7 +1,7 @@
 import { unref, nextTick } from 'vue';
 import { defineStore } from 'pinia';
 import { router } from '@/router';
-import { fetchLogin, fetchUserInfo } from '@/service';
+import { fetchLogin, fetchUserInfo, register } from '@/service';
 import { useRouterPush } from '@/composables';
 import { localStg } from '@/utils';
 import { useTabStore } from '../tab';
@@ -15,13 +15,23 @@ interface AuthState {
   token: string;
   /** 登录的加载状态 */
   loginLoading: boolean;
+  yiYan: {
+    content: string;
+    author: string;
+    book: string;
+  };
 }
 
 export const useAuthStore = defineStore('auth-store', {
   state: (): AuthState => ({
     userInfo: getUserInfo(),
     token: getToken(),
-    loginLoading: false
+    loginLoading: false,
+    yiYan: {
+      content: '书山有路勤为径，学海无涯苦作舟',
+      author: '<唐>韩愈',
+      book: '古今贤文·劝学篇'
+    }
   }),
   getters: {
     /** 是否登录 */
@@ -96,10 +106,10 @@ export const useAuthStore = defineStore('auth-store', {
       const { data } = await fetchUserInfo();
       if (data) {
         // 成功后把用户信息存储到缓存中
-        localStg.set('userInfo', data);
+        localStg.set('userInfo', data as Auth.UserInfo);
 
         // 更新状态
-        this.userInfo = data;
+        this.userInfo = data as Auth.UserInfo;
         this.token = token;
 
         successFlag = true;
@@ -116,7 +126,26 @@ export const useAuthStore = defineStore('auth-store', {
       this.loginLoading = true;
       const { data } = await fetchLogin(userName, password);
       if (data) {
+        this.token = data.token;
         await this.handleActionAfterLogin(data);
+      }
+      this.loginLoading = false;
+    },
+
+    /* 注册 */
+
+    async create(createInfo: Auth.CreateInfo) {
+      this.loginLoading = true;
+      const { data } = await register(createInfo);
+      if (data) {
+        window.$notification?.success({
+          title: '注册成功!',
+          content: `即将为您自动登录平台`,
+          duration: 3000
+        });
+        setTimeout(() => {
+          this.login(createInfo.userName, createInfo.password);
+        }, 3000);
       }
       this.loginLoading = false;
     },
@@ -144,6 +173,14 @@ export const useAuthStore = defineStore('auth-store', {
         resetRouteStore();
         initAuthRoute();
       }
+    },
+    async getYiyan() {
+      const hk = await fetch('https://v1.hitokoto.cn?c=i')
+        .then(response => response.json())
+        .then(data => {
+          return { content: data.hitokoto, author: data.from_who, book: data.from };
+        });
+      this.yiYan = hk;
     }
   }
 });

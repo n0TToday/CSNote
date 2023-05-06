@@ -2,41 +2,255 @@ import { defineStore } from 'pinia';
 import {
   createNoteApi,
   deleteNoteApi,
-  getNoteDetailApi,
-  getNoteInfoApi,
-  updateNoteDetailApi,
-  updateNoteInfoApi
+  getArchNoteListApi,
+  getDelNoteListApi,
+  getFastNoteListApi,
+  getNoteApi,
+  getShareNoteListApi,
+  getStarNoteListApi,
+  updateNoteApi
 } from '~/src/service';
-import { isNull } from '~/src/utils';
-import { useRepoStore } from '../repo';
-import { initNewRepo } from '../repo/helper';
-import { emptyNoteInfo } from './helper';
+import { isNumber } from '~/src/utils';
+import { useAppStore } from '../app';
+import { initNewFastNote } from './helper';
 
 interface NoteState {
-  noteInfo: Note.NoteInfo[];
+  noteDetail: Note.NoteDetail[];
+  currentNote?: Note.NoteDetail;
+  fastNoteList: Note.FastNoteList[];
+  delNoteList: Note.DelNoteList[];
+  archNoteList: Note.ArchNoteList[];
+  starNoteList: Note.StarNoteList[];
+  shareNoteList: Note.ShareNoteList[];
 }
+
+/* 业务需要：
+四个列表
+一个详情列表
+一个当前
+*/
+
+/* 业务操作：
+1. 回收站笔记
+	- API 更新笔记（后端修改del状态及时间）
+	- 删除笔记详情
+	- 刷新列表
+2. 归档笔记
+	- API 更新笔记（后端修改arch状态及时间）
+	- 刷新笔记详情
+	- 刷新列表
+3. 收藏笔记
+	- API 更新笔记（后端修改star状态及时间）
+	- 刷新笔记详情
+	- 刷新列表
+
+4. 分享笔记
+	- API 更新笔记（后端修改share状态及时间）
+	- 刷新笔记详情
+	- 刷新列表
+
+5. 编辑笔记信息
+	- 获取详情
+	- 替换详情
+	- API 更新笔记
+	- 刷新笔记详情
+	- 刷新列表
+
+6. 编辑笔记内容
+
+7. 查看笔记
+	- 本地在线
+
+8. 彻底删除笔记
+	- API 删除笔记
+	- 后端：将笔记所在知识库的笔记列表更新，更新标签数量
+	- 刷新列表
+	- 删除笔记详情
+
+9. 初始化四个列表 */
 
 export const useNoteStore = defineStore('note-store', {
   state: (): NoteState => ({
-    noteInfo: [emptyNoteInfo]
+    noteDetail: [],
+    currentNote: undefined,
+    fastNoteList: [],
+    delNoteList: [],
+    archNoteList: [],
+    starNoteList: [],
+    shareNoteList: []
   }),
   getters: {},
   actions: {
-    /* 对 state 操作
-		state：保存到Info，缓存
-		state：has，从Info中删除
-		state：has，更新Info
-		state：has，没有获取，保存到Info
-
-		*/
-    resetNoteStore() {
-      this.$reset();
+    /* 创建速记 */
+    async createNewFastNote(content: string) {
+      // 生成速记
+      const newNote = initNewFastNote(content);
+      // 获取实例，提交后端
+      const { data } = await createNoteApi(newNote);
+      // 获取后端返回Id
+      if (data) {
+        // 保存状态
+        this.initList();
+        window.$message?.success('速记已保存~');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 1000);
+        return true;
+      }
+      return false;
     },
 
-    hasNoteInfoInState(noteId: string) {
-      if (isNull(noteId)) return false;
+    /* 创建笔记 */
+    async createNewNote(newNote: Note.NoteDetail) {
+      // 获取实例，提交后端
+      const { data } = await createNoteApi(newNote);
+      // 获取后端返回Id
+      if (data) {
+        // 保存状态
+        this.refreshND(data);
+        window.$message?.success('笔记创建成功');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 1000);
+        this.initList();
+      }
+    },
+
+    /* 修改笔记状态 */
+    async changeNote(noteId: string, type: string) {
+      const { data } = await updateNoteApi(noteId, type);
+      if (data) {
+        if (isNumber(this.hasND(noteId))) this.refreshND(noteId);
+        this.initList();
+        window.$message?.success('笔记修改成功！');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 1000);
+      }
+    },
+
+    /* 编辑笔记 */
+    async editNote(noteId: string) {
+      // 获取修改后内容
+      const num = this.hasND(noteId);
+      if (isNumber(num)) {
+        const newNote = this.noteDetail[num];
+        // API
+        const { data } = await updateNoteApi(noteId, 'update', newNote);
+        if (data) {
+          this.refreshND(noteId);
+          this.initList();
+          window.$message?.success('笔记修改成功！');
+          setTimeout(() => {
+            useAppStore().reloadPage();
+          }, 1000);
+        }
+      }
+    },
+
+    /* 收藏操作 */
+    async starNote(noteId: string) {
+      // 获取repo详情
+      const note = await this.getND(noteId);
+      if (note) {
+        // 更新note
+        await updateNoteApi(noteId, 'star', note);
+        // 刷新三个list
+        this.initList();
+        // 刷新RD
+        this.refreshND(noteId);
+        window.$message?.success('操作成功！');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 1000);
+      }
+    },
+
+    // 回收操作
+    async delNote(noteId: string) {
+      // 获取repo详情
+      const note = await this.getND(noteId);
+      if (note) {
+        // 更新note
+        await updateNoteApi(noteId, 'del', note);
+        // 刷新三个list
+        this.initList();
+        // 刷新RD
+        this.refreshND(noteId);
+        window.$message?.success('操作成功！');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 1000);
+      }
+    },
+
+    async archNote(noteId: string) {
+      // 获取repo详情
+      const note = await this.getND(noteId);
+      if (note) {
+        // 更新note
+        await updateNoteApi(noteId, 'arch', note);
+        // 刷新三个list
+        this.initList();
+        // 刷新RD
+        this.refreshND(noteId);
+        window.$message?.success('操作成功！');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 1000);
+      }
+    },
+
+    async shareNote(noteId: string) {
+      // 获取repo详情
+      const note = await this.getND(noteId);
+      if (note) {
+        // 更新note
+        await updateNoteApi(noteId, 'share', note);
+        // 刷新三个list
+        this.initList();
+        // 刷新RD
+        this.refreshND(noteId);
+        window.$message?.success('操作成功！');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 1000);
+      }
+    },
+    /** 彻底删除笔记详情 */
+    async deleteNote(noteId: string) {
+      const { data } = await deleteNoteApi(noteId);
+      if (data) {
+        this.initList();
+        this.deleteND(noteId);
+        window.$message?.success('删除成功！');
+        setTimeout(() => {
+          useAppStore().reloadPage();
+        }, 1000);
+      }
+    },
+
+    // 获取笔记详情(先本地，再在线)
+    async getND(noteId: string) {
+      // 检查状态
+      const num = this.hasND(noteId);
+      if (isNumber(num)) {
+        // 有，直接返回
+        return this.noteDetail[num];
+      }
+      // 没有，请求后端返回并保存
+      const { data } = await getNoteApi(noteId);
+      if (data) {
+        this.noteDetail.push(data);
+        return data;
+      }
+      return false;
+    },
+
+    // 查找笔记存在
+    hasND(noteId: string) {
       let index = 0;
-      for (const note of this.noteInfo) {
+      for (const note of this.noteDetail) {
         if (note.noteId === noteId) {
           return index;
         }
@@ -45,202 +259,80 @@ export const useNoteStore = defineStore('note-store', {
       return false;
     },
 
-    addNoteInfoToState(noteInfo: Note.NoteInfo) {
-      const noteId = noteInfo.noteId;
-      if (this.hasNoteInfoInState(noteId)) return false;
-
-      this.noteInfo.push(noteInfo);
-      return true;
+    // 刷新笔记详情（在线刷新）
+    async refreshND(noteId: string) {
+      const { data } = await getNoteApi(noteId);
+      if (data) {
+        // 找有没有
+        const num = this.hasND(noteId);
+        if (isNumber(num)) {
+          // 有就刷新
+          this.noteDetail[num] = data;
+        }
+        // 没有就添加
+        this.noteDetail.push(data);
+      }
     },
 
-    removeNoteInfoFromState(noteId: string) {
-      const num = this.hasNoteInfoInState(noteId);
-      if (num) {
-        this.noteInfo.splice(num);
+    // 删除笔记详情
+    deleteND(noteId: string) {
+      // 找有没有
+      const num = this.hasND(noteId);
+      if (isNumber(num)) {
+        this.noteDetail.splice(num);
         return true;
       }
       return false;
     },
 
-    updateNoteInfoInState(noteInfo: Note.NoteInfo) {
-      const noteId: string = noteInfo.noteId;
-      const num = this.hasNoteInfoInState(noteId);
-      if (num) {
-        this.noteInfo[num] = noteInfo;
+    // 初始化列表
+    async initDelList() {
+      const { data } = await getDelNoteListApi();
+      if (data) {
+        this.delNoteList = data;
+        return true;
+      }
+      return false;
+    },
+    async initFastList() {
+      const { data } = await getFastNoteListApi();
+      if (data) {
+        this.fastNoteList = data;
+        return true;
+      }
+      return false;
+    },
+    async initStarList() {
+      const { data } = await getStarNoteListApi();
+      if (data) {
+        this.starNoteList = data;
+        return true;
+      }
+      return false;
+    },
+    async initArchList() {
+      const { data } = await getArchNoteListApi();
+      if (data) {
+        this.archNoteList = data;
+        return true;
+      }
+      return false;
+    },
+    async initShareList() {
+      const { data } = await getShareNoteListApi();
+      if (data) {
+        this.shareNoteList = data;
         return true;
       }
       return false;
     },
 
-    /* 业务逻辑整理
-				笔记、速记
-				增 —— 新建笔记、新建速记、保存笔记至自己知识库
-				删 —— 删除笔记
-				改 —— 更改标题、更改内容、更改分类、更改标签、分享笔记、取消分享、速记类型转换、归档笔记
-				查 —— 获取笔记简介、获取笔记内容（并记录访问）
-
-				笔记内容由单个组件单独存储
-
-				待添加：
-				1. 鉴权
-				2. 记录活动记录
-
-				*/
-
-    async getNoteInfo(noteId: string) {
-      // 检查状态
-      const num = this.hasNoteInfoInState(noteId);
-      if (num) {
-        // 有，直接返回
-        return this.noteInfo[num];
-      }
-      // 没有，请求后端返回并保存状态
-      const { data } = await getNoteInfoApi(noteId);
-      if (data) {
-        this.addNoteInfoToState(data);
-        return data;
-      }
-      return false;
-    },
-
-    async getNoteDetail(noteId: string) {
-      const { data } = await getNoteDetailApi(noteId);
-      if (data) {
-        // 检查状态
-        if (this.hasNoteInfoInState(noteId)) {
-          // 有，更新状态
-          this.updateNoteInfoInState(data.noteInfo);
-        }
-        // 没有，保存状态
-        this.addNoteInfoToState(data.noteInfo);
-        return data;
-      }
-      return false;
-      // 返回详情
-    },
-
-    async createNewNote(note: Note.NoteDetail) {
-      // 获取实例，提交后端
-      const { data } = await createNoteApi(note);
-      // 获取后端返回Id
-      if (data) {
-        const noteInfo = note.noteInfo;
-        noteInfo.noteId = data;
-        // 保存状态
-        this.addNoteInfoToState(note.noteInfo);
-        // 下一步操作
-        return data;
-      }
-      return false;
-    },
-
-    async deleteNote(noteId: string) {
-      // 鉴权
-      // 提交后端
-      const { data } = await deleteNoteApi(noteId);
-      if (data) {
-        // 检查状态，删除状态
-        const num = this.hasNoteInfoInState(noteId);
-        if (num) {
-          return this.removeNoteInfoFromState(noteId);
-        }
-        return true;
-      }
-      return false;
-    },
-
-    async updateNoteInfo(noteInfo: Note.NoteInfo) {
-      const noteId = noteInfo.noteId;
-      const { data } = await updateNoteInfoApi(noteId, noteInfo);
-      if (data) {
-        // 更新状态
-        if (this.updateNoteInfoInState(data)) {
-          // 没有，保存状态
-          this.addNoteInfoToState(data);
-        }
-        return data;
-      }
-      return false;
-    },
-
-    async updateNoteContent(note: Note.NoteDetail) {
-      const noteId = note.noteInfo.noteId;
-      const { data } = await updateNoteDetailApi(noteId, note);
-      if (data) {
-        if (!this.updateNoteInfoInState(data.noteInfo)) {
-          this.addNoteInfoToState(data.noteInfo);
-        }
-        return data;
-      }
-      return false;
-    },
-
-    async saveNoteToOwnLib(noteId: string) {
-      // 获取后端实例
-      const note = await this.getNoteDetail(noteId);
-      if (note) {
-        // 更改create信息
-        note.noteInfo.createInfo = initNewRepo().createInfo;
-        // 提交后端
-        const data = await this.createNewNote(note);
-        if (data) {
-          return data;
-        }
-      }
-      return false;
-    },
-
-    async classifyNote(noteId: string, repoInfo: Repo.RepoInfo) {
-      const noteInfo = await this.getNoteInfo(noteId);
-      if (noteInfo) {
-        noteInfo.noteRepo = repoInfo;
-        if (await this.updateNoteInfo(noteInfo)) {
-          const repoStore = useRepoStore();
-          repoStore.moveNoteToRepo(
-            { noteId, noteTitle: noteInfo.noteTitle },
-            noteInfo.noteRepo.repoId,
-            repoInfo.repoId
-          );
-        }
-        return true;
-      }
-      return false;
-    },
-
-    async starNote(noteId: string) {
-      const noteInfo = await this.getNoteInfo(noteId);
-      if (noteInfo) {
-        noteInfo.isStar = !noteInfo.isStar;
-        if (await this.updateNoteInfo(noteInfo)) return true;
-      }
-      return false;
-    },
-
-    async shareNote(noteId: string) {
-      const noteInfo = await this.getNoteInfo(noteId);
-      if (noteInfo) {
-        noteInfo.isShare = !noteInfo.isShare;
-        if (await this.updateNoteInfo(noteInfo)) return true;
-      }
-      return false;
-    },
-
-    async archiveNote(noteId: string) {
-      /* To-Do
-			用户注册时默认创建未分类和已归档两个知识库用以保存笔记。
-			*/
-      const archiveRepo: Repo.RepoInfo = {
-        repoId: '',
-        isStar: false,
-        repoNoteNum: 0,
-        repoTitle: '已归档'
-      };
-      const noteInfo = await this.getNoteInfo(noteId);
-      if (noteInfo) {
-        noteInfo.isArchive = !noteInfo.isArchive;
-        if (await this.classifyNote(noteInfo.noteId, archiveRepo)) return true;
-      }
-      return false;
+    initList() {
+      this.initFastList();
+      this.initDelList();
+      this.initStarList();
+      this.initArchList();
+      this.initShareList();
     }
   }
 });

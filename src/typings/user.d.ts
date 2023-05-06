@@ -15,6 +15,16 @@ declare namespace Auth {
     userName: string;
     /** 用户角色类型 */
     userRole: RoleType;
+    userPhone: number;
+    createTime: number;
+  }
+
+  interface CreateInfo {
+    userName: string;
+    userPhone: string;
+    code: string;
+    password: string;
+    confirmPwd: string;
   }
 }
 type UserInfo = Auth.UserInfo;

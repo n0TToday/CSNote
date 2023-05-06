@@ -9,7 +9,7 @@
     <n-space :vertical="true" :size="24">
       <div class="flex-y-center justify-between">
         <n-checkbox v-model:checked="rememberMe">记住我</n-checkbox>
-        <n-button :text="true" @click="toLoginModule('reset-pwd')">忘记密码？</n-button>
+        <!-- <n-button :text="true" @click="toLoginModule('reset-pwd')">忘记密码？</n-button> -->
       </div>
       <n-button
         type="primary"
@@ -22,16 +22,12 @@
         确定
       </n-button>
       <div class="flex-y-center justify-between">
-        <n-button class="flex-1" :block="true" @click="toLoginModule('code-login')">
-          {{ EnumLoginModule['code-login'] }}
-        </n-button>
-        <div class="w-12px"></div>
         <n-button class="flex-1" :block="true" @click="toLoginModule('register')">
           {{ EnumLoginModule.register }}
         </n-button>
       </div>
     </n-space>
-    <other-account @login="handleLoginOtherAccount" />
+    <!-- <other-account @login="handleLoginOtherAccount" /> -->
   </n-form>
 </template>
 
@@ -42,7 +38,7 @@ import { EnumLoginModule } from '@/enum';
 import { useAuthStore } from '@/store';
 import { useRouterPush } from '@/composables';
 import { formRules } from '@/utils';
-import { OtherAccount } from './components';
+// import { OtherAccount } from './components';
 
 const auth = useAuthStore();
 const { login } = useAuthStore();
@@ -51,8 +47,8 @@ const { toLoginModule } = useRouterPush();
 const formRef = ref<HTMLElement & FormInst>();
 
 const model = reactive({
-  userName: 'Soybean',
-  password: 'soybean123'
+  userName: '测试账户',
+  password: 'zxcvbnm.'
 });
 
 const rules: FormRules = {
@@ -69,10 +65,10 @@ async function handleSubmit() {
   login(userName, password);
 }
 
-function handleLoginOtherAccount(param: { userName: string; password: string }) {
-  const { userName, password } = param;
-  login(userName, password);
-}
+// function handleLoginOtherAccount(param: { userName: string; password: string }) {
+//   const { userName, password } = param;
+//   login(userName, password);
+// }
 </script>
 
 <style scoped></style>

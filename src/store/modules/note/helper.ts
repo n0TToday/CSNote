@@ -1,50 +1,41 @@
-import { getNowTimeStamp, isNull } from '~/src/utils';
-import { useAuthStore } from '../auth';
-
-const userStore = useAuthStore();
-
-export const emptyNoteInfo: Note.NoteInfo = {
+export const emptyNote: Note.NoteDetail = {
   noteId: '',
   noteTitle: '',
   noteType: 'note',
-  noteRepo: undefined,
-  isArchive: false,
-  noteTag: [],
-  createInfo: {
-    createTime: 0,
-    createUser: {
-      userId: '',
-      userName: '',
-      userRole: 'user'
-    }
-  },
+  updateTime: 0,
   isShare: false,
-  visitNum: 0
-};
-
-export const emptyNote: Note.NoteDetail = {
-  noteInfo: emptyNoteInfo,
-  noteContent: ''
+  shareTime: 0,
+  isStar: false,
+  starTime: 0,
+  isArchive: false,
+  archTime: 0,
+  isDel: false,
+  delTime: 0,
+  repoId: '',
+  visitNum: 0,
+  tagList: [],
+  createTime: 0,
+  userId: '',
+  userName: '',
+  noteContent: undefined
 };
 
 const emptyFastNote = emptyNote;
-emptyFastNote.noteInfo.noteType = 'fast';
+emptyFastNote.noteType = 'fast';
 
 /* 笔记模块辅助业务逻辑 */
 
 /* 初始化一个新笔记 */
 export function initNewNote() {
   const newNote = emptyNote;
-  newNote.noteInfo.createInfo.createTime = getNowTimeStamp();
-  newNote.noteInfo.createInfo.createUser = userStore.userInfo;
   return newNote;
 }
 
 /* 初始化一个新速记 */
-export function initNewFastNote() {
+export function initNewFastNote(cont: string) {
   const newFastNote = emptyFastNote;
-  newFastNote.noteInfo.createInfo.createTime = getNowTimeStamp();
-  newFastNote.noteInfo.createInfo.createUser = userStore.userInfo;
+  newFastNote.noteType = 'fast';
+  newFastNote.noteContent = cont;
   return newFastNote;
 }
 
@@ -63,15 +54,15 @@ export function isEmptyFastNote(note: Note.NoteDetail) {
 }
 
 /** 检查Note中Tag是否存在并返回位置 */
-export function hasNoteInNote(noteInfo: Note.NoteInfo, tagId: string) {
-  if (isNull(tagId)) return false;
-  const tagList = noteInfo.noteTag;
-  let index = 0;
-  for (const i of tagList) {
-    if (i.tagId === tagId) {
-      return index;
-    }
-    index += 1;
-  }
-  return false;
-}
+// export function hasNoteInNote(noteInfo: Note.NoteInfo, tagId: string) {
+//   if (isNull(tagId)) return false;
+//   const tagList = noteTag;
+//   let index = 0;
+//   for (const i of tagList) {
+//     if (i.tagId === tagId) {
+//       return index;
+//     }
+//     index += 1;
+//   }
+//   return false;
+// }

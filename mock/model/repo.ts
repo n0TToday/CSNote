@@ -1,26 +1,18 @@
 export const repoModel: Repo.RepoDetail[] = [
   {
     repoInfo: {
-      repoId: '1',
-      repoNoteNum: 3,
-      repoTitle: '更改测试',
+      repoId: 'repo123',
+      repoNoteNum: 1,
+      repoTitle: 'Go语言知识库',
       isStar: false
     },
     createInfo: {
-      createDate: 1681542520654,
-      createUser: { userId: '0', userName: 'Soybean', userRole: 'admin' }
+      createTime: 1681542520654,
+      createUser: { userId: '0', userName: '刘晓炜', userRole: 'user' }
     },
-    noteList: [{ noteId: '1', noteTitle: 'Go语言基础' }],
+    noteList: [{ value: 'note123', label: '这是一个笔记标题' }],
     repoDesc: '这是一个库',
-    visitInfo: {
-      visitNum: 5,
-      visitDate: 1681542520654,
-      visitUser: {
-        userId: '0',
-        userName: 'Soybean',
-        userRole: 'admin'
-      }
-    }
+    visitNum: 123
   },
   {
     repoInfo: {
@@ -30,20 +22,12 @@ export const repoModel: Repo.RepoDetail[] = [
       isStar: true
     },
     createInfo: {
-      createDate: 1681542520654,
-      createUser: { userId: '0', userName: 'Soybean', userRole: 'admin' }
+      createTime: 1681542520654,
+      createUser: { userId: '0', userName: '刘晓炜', userRole: 'admin' }
     },
-    noteList: [{ noteId: '1', noteTitle: 'Go语言基础' }],
+    noteList: [{ value: '1', label: 'Go语言基础' }],
     repoDesc: '这是一个库',
-    visitInfo: {
-      visitNum: 5,
-      visitDate: 1681542520654,
-      visitUser: {
-        userId: '0',
-        userName: 'Soybean',
-        userRole: 'admin'
-      }
-    }
+    visitNum: 11
   },
   {
     repoInfo: {
@@ -53,20 +37,12 @@ export const repoModel: Repo.RepoDetail[] = [
       isStar: false
     },
     createInfo: {
-      createDate: 1681542520654,
-      createUser: { userId: '0', userName: 'Soybean', userRole: 'admin' }
+      createTime: 1681542520654,
+      createUser: { userId: '0', userName: '刘晓炜', userRole: 'admin' }
     },
-    noteList: [{ noteId: '1', noteTitle: 'Go语言基础' }],
+    noteList: [{ value: '1', label: 'Go语言基础' }],
     repoDesc: '这是一个库',
-    visitInfo: {
-      visitNum: 5,
-      visitDate: 1681542520654,
-      visitUser: {
-        userId: '0',
-        userName: 'Soybean',
-        userRole: 'admin'
-      }
-    }
+    visitNum: 1
   },
   {
     repoInfo: {
@@ -76,46 +52,11 @@ export const repoModel: Repo.RepoDetail[] = [
       isStar: false
     },
     createInfo: {
-      createDate: 1681542520654,
-      createUser: { userId: '0', userName: 'Soybean', userRole: 'admin' }
+      createTime: 1681542520654,
+      createUser: { userId: '0', userName: '刘晓炜', userRole: 'admin' }
     },
-    noteList: [{ noteId: '1', noteTitle: 'Go语言基础' }],
+    noteList: [{ value: '1', label: 'Go语言基础' }],
     repoDesc: '这是一个库',
-    visitInfo: {
-      visitNum: 5,
-      visitDate: 1681542520654,
-      visitUser: {
-        userId: '0',
-        userName: 'Soybean',
-        userRole: 'admin'
-      }
-    }
-  }
-];
-
-export const repoListModel: Repo.RepoInfo[] = [
-  {
-    repoId: '1',
-    repoNoteNum: 3,
-    repoTitle: '你好',
-    isStar: false
-  },
-  {
-    repoId: '3',
-    repoNoteNum: 7,
-    repoTitle: 'TypeScript',
-    isStar: true
-  },
-  {
-    repoId: '2',
-    repoNoteNum: 0,
-    repoTitle: 'Java',
-    isStar: false
-  },
-  {
-    repoId: '7',
-    repoNoteNum: 1,
-    repoTitle: 'C++',
-    isStar: false
+    visitNum: 1
   }
 ];

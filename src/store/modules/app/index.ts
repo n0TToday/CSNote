@@ -6,12 +6,14 @@ interface AppState {
   reloadFlag: boolean;
   /** 侧边栏折叠状态 */
   siderCollapse: boolean;
+  firstLoad: boolean;
 }
 
 export const useAppStore = defineStore('app-store', {
   state: (): AppState => ({
     reloadFlag: true,
-    siderCollapse: false
+    siderCollapse: false,
+    firstLoad: true
   }),
   actions: {
     /**

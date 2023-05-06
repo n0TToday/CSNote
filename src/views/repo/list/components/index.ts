@@ -1,3 +1,3 @@
-import repoCard from './repo-card/index.vue';
+import RepoCard from './repo-card/index.vue';
 
-export { repoCard };
+export { RepoCard };

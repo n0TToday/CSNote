@@ -2,16 +2,16 @@ import type { GlobalThemeOverrides } from 'naive-ui';
 import { cloneDeep } from 'lodash-es';
 import { localStg, addColorAlpha, getColorPalette } from '@/utils';
 
-const jsonSetting = {
+const jsonSetting: Theme.Setting = {
   darkMode: false,
   followSystemTheme: true,
   layout: {
     minWidth: 900,
     mode: 'vertical'
   },
-  themeColor: '#60281E',
+  themeColor: '#f4511e',
   otherColor: {
-    info: '#3b140f',
+    info: '#096dd9',
     success: '#52c41a',
     warning: '#faad14',
     error: '#f5222d'
@@ -21,27 +21,24 @@ const jsonSetting = {
   showReload: true,
   header: {
     inverted: false,
-    height: 50,
+    height: 56,
     crumb: { visible: true, showIcon: false }
   },
   tab: {
     visible: true,
-    height: 45,
-    mode: 'button',
+    height: 44,
+    mode: 'chrome',
     isCache: true
   },
   sider: {
     inverted: false,
-    width: 260,
-    collapsedWidth: 64,
-    mixWidth: 80,
-    mixCollapsedWidth: 48,
-    mixChildMenuWidth: 200
+    width: 220,
+    collapsedWidth: 64
   },
-  menu: {
-    horizontalPosition: 'flex-start'
-  },
-  footer: { fixed: false, height: 48, visible: false }
+  menu: '',
+  footer: {
+    visible: false
+  }
 };
 
 const themeSetting = jsonSetting as Theme.Setting;

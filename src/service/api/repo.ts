@@ -1,25 +1,29 @@
-import { mockRequest } from '../request';
+import { request } from '../request';
 
-export function getRepoInfoApi(repoId: string) {
-  return mockRequest.get<Repo.RepoInfo>(`/note/repo/${repoId}`);
+export function getDelRepoListApi() {
+  return request.get<Repo.DelRepoList[]>(`/repo?type=del`);
 }
 
-export function getRepoDetailApi(repoId: string) {
-  return mockRequest.get<Repo.RepoDetail>(`/repo/${repoId}`);
+export function getStarRepoListApi() {
+  return request.get<Repo.StarRepoList[]>(`/repo?type=star`);
 }
 
 export function getRepoListApi() {
-  return mockRequest.get<Repo.RepoInfo[]>(`/repo/`);
+  return request.get<Repo.RepoList[]>(`/repo`);
 }
 
-export function createRepoApi(newRepo: Repo.RepoDetail) {
-  return mockRequest.post<string>('/repo', newRepo);
+export function getRepoApi(repoId: string) {
+  return request.get<Repo.RepoDetail>(`/repo/${repoId}`);
+}
+
+export function createRepoApi(newRepo: object) {
+  return request.post<string>('/repo', newRepo);
+}
+
+export function updateRepoApi(type: string, repoId: string, modifyRepo?: Repo.RepoDetail) {
+  return request.put<Repo.RepoDetail>(`/repo/${repoId}?type=${type}`, modifyRepo);
 }
 
 export function deleteRepoApi(repoId: string) {
-  return mockRequest.delete<boolean>(`/repo/${repoId}`, {});
-}
-
-export function updateRepoApi(repoId: string, modifyRepo: Repo.RepoDetail) {
-  return mockRequest.put<Repo.RepoDetail>(`/repo/${repoId}`, modifyRepo);
+  return request.delete<boolean>(`/repo/${repoId}`, {});
 }
